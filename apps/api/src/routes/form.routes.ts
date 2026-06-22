@@ -1,11 +1,37 @@
-﻿import { Router } from 'express';
-import { authenticate } from '../middlewares/auth';
+import { Router } from 'express';
+import { FormController } from '../controllers/form.controller';
+import { authenticate, requireRoles } from '../middlewares/auth';
+import { USER_ROLES } from '@cddas/shared';
+
 const router = Router();
+
 router.use(authenticate);
-// TODO: Implement form routes
-router.get('/', (req, res) => res.json({ success: true, data: [], message: 'form module ready' }));
-router.get('/:id', (req, res) => res.json({ success: true, data: null }));
-router.post('/', (req, res) => res.json({ success: true, message: 'Created' }));
-router.put('/:id', (req, res) => res.json({ success: true, message: 'Updated' }));
-router.delete('/:id', (req, res) => res.json({ success: true, message: 'Deleted' }));
+
+// Get all forms
+router.get('/', FormController.getAll);
+
+// Get single form
+router.get('/:id', FormController.getById);
+
+// Create form (Admins and HODs)
+router.post(
+  '/', 
+  requireRoles([USER_ROLES.SUPER_ADMIN, USER_ROLES.DEPARTMENT_ADMIN, USER_ROLES.HOD]), 
+  FormController.create
+);
+
+// Update form
+router.put(
+  '/:id', 
+  requireRoles([USER_ROLES.SUPER_ADMIN, USER_ROLES.DEPARTMENT_ADMIN, USER_ROLES.HOD]), 
+  FormController.update
+);
+
+// Delete form
+router.delete(
+  '/:id', 
+  requireRoles([USER_ROLES.SUPER_ADMIN, USER_ROLES.DEPARTMENT_ADMIN, USER_ROLES.HOD]), 
+  FormController.delete
+);
+
 export default router;
