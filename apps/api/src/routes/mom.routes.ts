@@ -1,11 +1,37 @@
-﻿import { Router } from 'express';
-import { authenticate } from '../middlewares/auth';
+import { Router } from 'express';
+import { MomController } from '../controllers/mom.controller';
+import { authenticate, requireRoles } from '../middlewares/auth';
+import { USER_ROLES } from '@cddas/shared';
+
 const router = Router();
+
 router.use(authenticate);
-// TODO: Implement mom routes
-router.get('/', (req, res) => res.json({ success: true, data: [], message: 'mom module ready' }));
-router.get('/:id', (req, res) => res.json({ success: true, data: null }));
-router.post('/', (req, res) => res.json({ success: true, message: 'Created' }));
-router.put('/:id', (req, res) => res.json({ success: true, message: 'Updated' }));
-router.delete('/:id', (req, res) => res.json({ success: true, message: 'Deleted' }));
+
+// Get all meetings
+router.get('/', MomController.getAll);
+
+// Get single meeting
+router.get('/:id', MomController.getById);
+
+// Create meeting (HOD, Dept Admin, Super Admin)
+router.post(
+  '/', 
+  requireRoles([USER_ROLES.SUPER_ADMIN, USER_ROLES.DEPARTMENT_ADMIN, USER_ROLES.HOD]), 
+  MomController.create
+);
+
+// Update meeting
+router.put(
+  '/:id', 
+  requireRoles([USER_ROLES.SUPER_ADMIN, USER_ROLES.DEPARTMENT_ADMIN, USER_ROLES.HOD]), 
+  MomController.update
+);
+
+// Delete meeting
+router.delete(
+  '/:id', 
+  requireRoles([USER_ROLES.SUPER_ADMIN, USER_ROLES.DEPARTMENT_ADMIN, USER_ROLES.HOD]), 
+  MomController.delete
+);
+
 export default router;
