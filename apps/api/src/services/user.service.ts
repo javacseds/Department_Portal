@@ -1,6 +1,6 @@
 import { prisma, Prisma, User } from '@cddas/database';
 import { AppError } from '../middlewares/error';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
 export class UserService {
   static async getAll(params: {
@@ -88,7 +88,7 @@ export class UserService {
       },
     });
 
-    if (!user) throw new AppError(404, 'User not found');
+    if (!user) throw new AppError('User not found', 404);
     return user;
   }
 
@@ -103,8 +103,8 @@ export class UserService {
     });
 
     if (existing) {
-      if (existing.email === data.email) throw new AppError(409, 'Email already registered');
-      if (existing.employeeId === data.employeeId) throw new AppError(409, 'Employee ID already in use');
+      if (existing.email === data.email) throw new AppError('Email already registered', 409);
+      if (existing.employeeId === data.employeeId) throw new AppError('Employee ID already in use', 409);
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -142,8 +142,8 @@ export class UserService {
       });
 
       if (existing) {
-        if (existing.email === data.email) throw new AppError(409, 'Email already registered');
-        if (existing.employeeId === data.employeeId) throw new AppError(409, 'Employee ID already in use');
+        if (existing.email === data.email) throw new AppError('Email already registered', 409);
+        if (existing.employeeId === data.employeeId) throw new AppError('Employee ID already in use', 409);
       }
     }
 
@@ -165,7 +165,9 @@ export class UserService {
       await prisma.user.delete({ where: { id } });
       return true;
     } catch (error) {
-      throw new AppError(400, 'Cannot delete user because they have associated records. Consider deactivating them instead.');
+      throw new AppError('Cannot delete user because they have associated records. Consider deactivating them instead.', 400);
     }
   }
 }
+
+

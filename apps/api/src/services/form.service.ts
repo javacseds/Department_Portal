@@ -57,7 +57,7 @@ export class FormService {
       },
     });
 
-    if (!form) throw new AppError(404, 'Form not found');
+    if (!form) throw new AppError('Form not found', 404);
     return form;
   }
 
@@ -87,3 +87,4 @@ export class FormService {
     return true;
   }
 }
+

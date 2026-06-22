@@ -6,13 +6,13 @@ export class FileController {
   static async upload(req: Request, res: Response, next: NextFunction) {
     try {
       if (!req.file) {
-        throw new AppError(400, 'No file provided');
+        throw new AppError('No file provided', 400);
       }
 
       const { departmentId, eventId, category, tags, description, academicYear } = req.body;
       
       const userId = req.user?.id;
-      if (!userId) throw new AppError(401, 'Unauthorized');
+      if (!userId) throw new AppError('Unauthorized', 401);
 
       const fileRecord = await FileService.handleFileUpload(req.file, {
         userId,
@@ -37,12 +37,12 @@ export class FileController {
   static async uploadMultiple(req: Request, res: Response, next: NextFunction) {
     try {
       if (!req.files || (req.files as Express.Multer.File[]).length === 0) {
-        throw new AppError(400, 'No files provided');
+        throw new AppError('No files provided', 400);
       }
 
       const { departmentId, eventId, category, tags, description, academicYear } = req.body;
       const userId = req.user?.id;
-      if (!userId) throw new AppError(401, 'Unauthorized');
+      if (!userId) throw new AppError('Unauthorized', 401);
 
       const files = req.files as Express.Multer.File[];
       const uploadedRecords = [];
@@ -107,3 +107,4 @@ export class FileController {
     }
   }
 }
+

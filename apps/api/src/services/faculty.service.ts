@@ -72,7 +72,7 @@ export class FacultyService {
       },
     });
 
-    if (!faculty) throw new AppError(404, 'Faculty not found');
+    if (!faculty) throw new AppError('Faculty not found', 404);
     return faculty;
   }
 
@@ -86,7 +86,7 @@ export class FacultyService {
     });
 
     if (existingFaculty) {
-      throw new AppError(409, 'Faculty with this Employee ID already exists');
+      throw new AppError('Faculty with this Employee ID already exists', 409);
     }
 
     // Use a transaction to create User and Faculty together
@@ -179,3 +179,4 @@ export class FacultyService {
     return true; // Prisma Cascade will delete the faculty record
   }
 }
+

@@ -1,13 +1,13 @@
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../middlewares/auth';
-import prisma from '../config/database';
-import { UserRole } from '@prisma/client';
+import { prisma } from '@cddas/database';
+import { USER_ROLES } from '@cddas/shared';
 
 export class DashboardController {
   async getStats(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const user = req.user!;
-      const whereClause = user.role !== UserRole.SUPER_ADMIN && user.departmentId
+      const whereClause = user.role !== USER_ROLES.SUPER_ADMIN && user.departmentId
         ? { departmentId: user.departmentId }
         : {};
 
@@ -16,24 +16,24 @@ export class DashboardController {
         facultyCount,
         studentCount,
         eventCount,
-        documentCount,
+        achievementCount,
         pendingApprovals,
         fileCount,
         recentActivity,
       ] = await Promise.all([
-        prisma.department.count({ where: { isActive: true } }),
+        prisma.department.count(),
         prisma.faculty.count({ where: whereClause }),
         prisma.student.count({ where: whereClause }),
         prisma.event.count({ where: whereClause }),
-        prisma.document.count({ where: { ...whereClause, isArchived: false } }),
-        prisma.approvalRequest.count({ where: { status: 'PENDING' } }),
+        prisma.achievement.count({ where: whereClause }),
+        prisma.approval.count({ where: { status: 'PENDING', ...whereClause } }),
         prisma.fileUpload.count({ where: whereClause }),
-        prisma.activityLog.findMany({
+        prisma.auditLog.findMany({
           take: 10,
           orderBy: { createdAt: 'desc' },
           include: {
             user: {
-              select: { firstName: true, lastName: true, avatarUrl: true, role: true },
+              select: { firstName: true, lastName: true, role: true },
             },
           },
         }),
@@ -41,20 +41,20 @@ export class DashboardController {
 
       // Storage usage
       const storageResult = await prisma.fileUpload.aggregate({
-        _sum: { fileSize: true },
+        _sum: { size: true },
         where: whereClause,
       });
-      const storageUsedBytes = storageResult._sum.fileSize || 0;
+      const storageUsedBytes = storageResult._sum.size || 0;
       const storageUsedMB = Math.round(storageUsedBytes / (1024 * 1024) * 10) / 10;
 
-      // Monthly document generation trend (last 6 months)
+      // Monthly events trend (last 6 months)
       const sixMonthsAgo = new Date();
       sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-      const monthlyDocs = await prisma.$queryRaw<{ month: string; count: number }[]>`
+      const monthlyEvents = await prisma.$queryRaw<{ month: string; count: number }[]>`
         SELECT TO_CHAR(DATE_TRUNC('month', "created_at"), 'Mon YYYY') as month,
                COUNT(*)::int as count
-        FROM documents
+        FROM "events"
         WHERE created_at >= ${sixMonthsAgo}
         GROUP BY DATE_TRUNC('month', "created_at")
         ORDER BY DATE_TRUNC('month', "created_at")
@@ -62,16 +62,16 @@ export class DashboardController {
 
       // Events by type
       const eventsByType = await prisma.event.groupBy({
-        by: ['eventType'],
+        by: ['type'],
         _count: true,
         where: whereClause,
       });
 
-      // Documents by type
-      const docsByType = await prisma.document.groupBy({
-        by: ['documentType'],
+      // Achievements by type
+      const achievementsByType = await prisma.achievement.groupBy({
+        by: ['type'],
         _count: true,
-        where: { ...whereClause, isArchived: false },
+        where: whereClause,
       });
 
       res.json({
@@ -82,54 +82,25 @@ export class DashboardController {
             faculty: facultyCount,
             students: studentCount,
             events: eventCount,
-            documents: documentCount,
+            achievements: achievementCount,
             pendingApprovals,
             files: fileCount,
             storageUsedMB,
           },
           charts: {
-            monthlyDocuments: monthlyDocs,
+            monthlyEvents: monthlyEvents,
             eventsByType: eventsByType.map((e) => ({
-              type: e.eventType,
+              type: e.type,
               count: e._count,
             })),
-            documentsByType: docsByType.map((d) => ({
-              type: d.documentType,
-              count: d._count,
+            achievementsByType: achievementsByType.map((a) => ({
+              type: a.type,
+              count: a._count,
             })),
           },
           recentActivity,
         },
       });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async getCalendarEvents(req: AuthRequest, res: Response, next: NextFunction) {
-    try {
-      const { month, year } = req.query;
-      const startDate = new Date(Number(year), Number(month) - 1, 1);
-      const endDate = new Date(Number(year), Number(month), 0);
-
-      const events = await prisma.event.findMany({
-        where: {
-          startDate: { gte: startDate, lte: endDate },
-          ...(req.user!.departmentId ? { departmentId: req.user!.departmentId } : {}),
-        },
-        select: {
-          id: true,
-          title: true,
-          eventType: true,
-          startDate: true,
-          endDate: true,
-          venue: true,
-          department: { select: { name: true, shortName: true } },
-        },
-        orderBy: { startDate: 'asc' },
-      });
-
-      res.json({ success: true, data: events });
     } catch (error) {
       next(error);
     }

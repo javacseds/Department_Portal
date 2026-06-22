@@ -13,7 +13,7 @@ export class MomService {
     const limit = Number(params.limit) || 25;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.MeetingWhereInput = {
+    const where: prisma.minutesOfMeeting.hereInput = {
       ...(params.status && { status: params.status }),
       ...(params.departmentId && { departmentId: params.departmentId }),
       ...(params.search && {
@@ -26,8 +26,8 @@ export class MomService {
     };
 
     const [total, data] = await Promise.all([
-      prisma.meeting.count({ where }),
-      prisma.meeting.findMany({
+      prisma.minutesOfMeeting.count({ where }),
+      prisma.minutesOfMeeting.findMany({
         where,
         skip,
         take: limit,
@@ -45,19 +45,19 @@ export class MomService {
   }
 
   static async getById(id: string) {
-    const meeting = await prisma.meeting.findUnique({
+    const meeting = await prisma.minutesOfMeeting.findUnique({
       where: { id },
       include: {
         department: { select: { id: true, name: true, shortName: true } },
       },
     });
 
-    if (!meeting) throw new AppError(404, 'Meeting not found');
+    if (!meeting) throw new AppError('Meeting not found', 404);
     return meeting;
   }
 
-  static async create(data: Prisma.MeetingUncheckedCreateInput) {
-    return prisma.meeting.create({
+  static async create(data: Prisma.MinutesOfMeetingUncheckedCreateInput) {
+    return prisma.minutesOfMeeting.create({
       data,
       include: {
         department: { select: { id: true, name: true, shortName: true } },
@@ -65,9 +65,9 @@ export class MomService {
     });
   }
 
-  static async update(id: string, data: Prisma.MeetingUncheckedUpdateInput) {
+  static async update(id: string, data: Prisma.MinutesOfMeetingUncheckedUpdateInput) {
     await this.getById(id);
-    return prisma.meeting.update({
+    return prisma.minutesOfMeeting.update({
       where: { id },
       data,
       include: {
@@ -78,7 +78,9 @@ export class MomService {
 
   static async delete(id: string) {
     await this.getById(id);
-    await prisma.meeting.delete({ where: { id } });
+    await prisma.minutesOfMeeting.delete({ where: { id } });
     return true;
   }
 }
+
+

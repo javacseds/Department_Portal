@@ -132,7 +132,7 @@ export class FileService {
       },
     });
 
-    if (!file) throw new AppError(404, 'File not found');
+    if (!file) throw new AppError('File not found', 404);
     return file;
   }
 
@@ -158,7 +158,8 @@ export class FileService {
       return true;
     } catch (error) {
       console.error('File deletion error:', error);
-      throw new AppError(500, 'Failed to delete file completely');
+      throw new AppError('Failed to delete file completely', 500);
     }
   }
 }
+

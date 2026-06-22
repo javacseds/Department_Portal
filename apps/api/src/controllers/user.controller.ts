@@ -61,7 +61,7 @@ export class UserController {
       };
 
       if (!data.collegeId) {
-        throw new AppError(400, 'College ID is required');
+        throw new AppError('College ID is required', 400);
       }
 
       const user = await UserService.create(data as any);
@@ -90,3 +90,4 @@ export class UserController {
     }
   }
 }
+

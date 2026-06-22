@@ -57,7 +57,7 @@ export class EventService {
       },
     });
 
-    if (!event) throw new AppError(404, 'Event not found');
+    if (!event) throw new AppError('Event not found', 404);
     return event;
   }
 
@@ -87,3 +87,4 @@ export class EventService {
     return true;
   }
 }
+

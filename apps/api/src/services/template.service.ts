@@ -1,4 +1,4 @@
-import { prisma, Prisma, DocumentTemplate } from '@cddas/database';
+import { prisma, Prisma, Template } from '@cddas/database';
 import { AppError } from '../middlewares/error';
 import { PdfGenerator } from '../utils/pdfGenerator';
 import { DocxGenerator } from '../utils/docxGenerator';
@@ -15,7 +15,7 @@ export class TemplateService {
     const limit = Number(params.limit) || 25;
     const skip = (page - 1) * limit;
 
-    const where: Prisma.DocumentTemplateWhereInput = {
+    const where: Prisma.TemplateWhereInput = {
       ...(params.type && { type: params.type }),
       ...(params.departmentId && {
         OR: [
@@ -32,8 +32,8 @@ export class TemplateService {
     };
 
     const [total, data] = await Promise.all([
-      prisma.documentTemplate.count({ where }),
-      prisma.documentTemplate.findMany({
+      prisma.Template.count({ where }),
+      prisma.Template.findMany({
         where,
         skip,
         take: limit,
@@ -51,26 +51,26 @@ export class TemplateService {
   }
 
   static async getById(id: string) {
-    const template = await prisma.documentTemplate.findUnique({
+    const template = await prisma.Template.findUnique({
       where: { id },
       include: {
         department: { select: { id: true, name: true, shortName: true } },
       },
     });
 
-    if (!template) throw new AppError(404, 'Template not found');
+    if (!template) throw new AppError('Template not found', 404);
     return template;
   }
 
-  static async create(data: Prisma.DocumentTemplateUncheckedCreateInput) {
-    return prisma.documentTemplate.create({
+  static async create(data: Prisma.TemplateUncheckedCreateInput) {
+    return prisma.Template.create({
       data,
     });
   }
 
-  static async update(id: string, data: Prisma.DocumentTemplateUncheckedUpdateInput) {
+  static async update(id: string, data: Prisma.TemplateUncheckedUpdateInput) {
     await this.getById(id);
-    return prisma.documentTemplate.update({
+    return prisma.Template.update({
       where: { id },
       data,
     });
@@ -78,7 +78,7 @@ export class TemplateService {
 
   static async delete(id: string) {
     await this.getById(id);
-    await prisma.documentTemplate.delete({ where: { id } });
+    await prisma.Template.delete({ where: { id } });
     return true;
   }
 
@@ -106,7 +106,7 @@ export class TemplateService {
         return { buffer, type: 'application/pdf', filename: `${template.name.replace(/\s+/g, '_')}_Generated.pdf` };
       } catch (error) {
         console.error('PDF Generation Error:', error);
-        throw new AppError(500, 'Failed to generate PDF document');
+        throw new AppError('Failed to generate PDF document', 500);
       }
     } 
     else if (template.type === 'docx') {
@@ -115,10 +115,12 @@ export class TemplateService {
         return { buffer, type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', filename: `${template.name.replace(/\s+/g, '_')}_Generated.docx` };
       } catch (error) {
         console.error('DOCX Generation Error:', error);
-        throw new AppError(500, 'Failed to generate Word document');
+        throw new AppError('Failed to generate Word document', 500);
       }
     }
     
-    throw new AppError(400, `Unsupported template type: ${template.type}`);
+    throw new AppError(`Unsupported template type: ${template.type}`, 400);
   }
 }
+
+

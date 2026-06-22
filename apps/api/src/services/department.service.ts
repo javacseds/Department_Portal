@@ -75,7 +75,7 @@ export class DepartmentService {
     });
 
     if (!department) {
-      throw new AppError(404, 'Department not found');
+      throw new AppError('Department not found', 404);
     }
 
     return department;
@@ -91,7 +91,7 @@ export class DepartmentService {
     });
 
     if (existing) {
-      throw new AppError(409, `Department code '${data.code}' already exists`);
+      throw new AppError(`Department code '${data.code}' already exists`, 409);
     }
 
     return prisma.department.create({
@@ -113,7 +113,7 @@ export class DepartmentService {
       });
 
       if (existing) {
-        throw new AppError(409, `Department code '${data.code}' is already in use`);
+        throw new AppError(`Department code '${data.code}' is already in use`, 409);
       }
     }
 
@@ -137,7 +137,8 @@ export class DepartmentService {
       return true;
     } catch (error) {
       // Handle foreign key constraint failures (e.g. users still assigned)
-      throw new AppError(400, 'Cannot delete department because it has associated users, faculty, or students. Please reassign them first.');
+      throw new AppError('Cannot delete department because it has associated users, faculty, or students. Please reassign them first.', 400);
     }
   }
 }
+

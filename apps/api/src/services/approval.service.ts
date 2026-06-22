@@ -96,7 +96,7 @@ export class ApprovalService {
       },
     });
 
-    if (!approval) throw new AppError(404, 'Approval request not found');
+    if (!approval) throw new AppError('Approval request not found', 404);
     return approval;
   }
 
@@ -112,7 +112,7 @@ export class ApprovalService {
   }) {
     // Basic validation
     if (!data.stages || data.stages.length === 0) {
-      throw new AppError(400, 'Approval must have at least one stage');
+      throw new AppError('Approval must have at least one stage', 400);
     }
 
     const approval = await prisma.approval.create({
@@ -165,19 +165,19 @@ export class ApprovalService {
     const approval = await this.getById(approvalId);
 
     if (approval.status === 'APPROVED' || approval.status === 'REJECTED') {
-      throw new AppError(400, `Approval is already ${approval.status}`);
+      throw new AppError(`Approval is already ${approval.status}`, 400);
     }
 
     // Find the current active stage
     const activeStage = approval.stages.find(s => s.stageOrder === approval.currentStage);
     
     if (!activeStage) {
-      throw new AppError(500, 'Invalid approval state: Active stage not found');
+      throw new AppError('Invalid approval state: Active stage not found', 500);
     }
 
     // Verify role (in a real system, also check if user has this role)
     if (activeStage.approverRole !== actionData.approverRole && actionData.approverRole !== 'SUPER_ADMIN') {
-      throw new AppError(403, `You are not authorized to act on this stage. Expected role: ${activeStage.approverRole}`);
+      throw new AppError(`You are not authorized to act on this stage. Expected role: ${activeStage.approverRole}`, 403);
     }
 
     // Update the stage
@@ -258,3 +258,4 @@ export class ApprovalService {
     return true;
   }
 }
+

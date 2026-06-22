@@ -53,7 +53,7 @@ export class FacultyController {
       const validatedData = createFacultySchema.parse(req.body);
       
       const collegeId = req.user?.collegeId;
-      if (!collegeId) throw new AppError(400, 'College ID not found for user');
+      if (!collegeId) throw new AppError('College ID not found for user', 400);
 
       const faculty = await FacultyService.create({
         ...validatedData,
@@ -85,3 +85,4 @@ export class FacultyController {
     }
   }
 }
+

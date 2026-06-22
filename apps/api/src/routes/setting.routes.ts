@@ -1,11 +1,18 @@
-﻿import { Router } from 'express';
-import { authenticate } from '../middlewares/auth';
+import { Router } from 'express';
+import { SettingController } from '../controllers/setting.controller';
+import { authenticate, requireRoles } from '../middlewares/auth';
+import { USER_ROLES } from '@cddas/shared';
+
 const router = Router();
+
+// Publicly available settings (e.g. College Name, Logo)
+router.get('/public', SettingController.getPublicSettings);
+
+// Authenticated routes
 router.use(authenticate);
-// TODO: Implement setting routes
-router.get('/', (req, res) => res.json({ success: true, data: [], message: 'setting module ready' }));
-router.get('/:id', (req, res) => res.json({ success: true, data: null }));
-router.post('/', (req, res) => res.json({ success: true, message: 'Created' }));
-router.put('/:id', (req, res) => res.json({ success: true, message: 'Updated' }));
-router.delete('/:id', (req, res) => res.json({ success: true, message: 'Deleted' }));
+
+// Super admin only for full settings management
+router.get('/', requireRoles([USER_ROLES.SUPER_ADMIN]), SettingController.getAll);
+router.put('/', requireRoles([USER_ROLES.SUPER_ADMIN]), SettingController.updateSettings);
+
 export default router;

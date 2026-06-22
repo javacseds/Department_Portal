@@ -59,7 +59,7 @@ export class CircularService {
       },
     });
 
-    if (!circular) throw new AppError(404, 'Circular not found');
+    if (!circular) throw new AppError('Circular not found', 404);
     return circular;
   }
 
@@ -69,7 +69,7 @@ export class CircularService {
       where: { referenceNo: data.referenceNo },
     });
 
-    if (existing) throw new AppError(409, 'Circular with this Reference Number already exists');
+    if (existing) throw new AppError('Circular with this Reference Number already exists', 409);
 
     return prisma.circular.create({
       data,
@@ -86,7 +86,7 @@ export class CircularService {
       const existing = await prisma.circular.findFirst({
         where: { referenceNo: data.referenceNo as string, id: { not: id } },
       });
-      if (existing) throw new AppError(409, 'Circular with this Reference Number already exists');
+      if (existing) throw new AppError('Circular with this Reference Number already exists', 409);
     }
 
     return prisma.circular.update({
@@ -104,3 +104,4 @@ export class CircularService {
     return true;
   }
 }
+

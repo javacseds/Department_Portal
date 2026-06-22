@@ -6,7 +6,7 @@ export class NotificationController {
   static async getMyNotifications(req: Request, res: Response, next: NextFunction) {
     try {
       const user = req.user;
-      if (!user) throw new AppError(401, 'Unauthorized');
+      if (!user) throw new AppError('Unauthorized', 401);
 
       const { limit, unreadOnly } = req.query;
 
@@ -29,7 +29,7 @@ export class NotificationController {
   static async markAsRead(req: Request, res: Response, next: NextFunction) {
     try {
       const user = req.user;
-      if (!user) throw new AppError(401, 'Unauthorized');
+      if (!user) throw new AppError('Unauthorized', 401);
 
       await NotificationService.markAsRead(req.params.id, user.id);
 
@@ -42,7 +42,7 @@ export class NotificationController {
   static async markAllAsRead(req: Request, res: Response, next: NextFunction) {
     try {
       const user = req.user;
-      if (!user) throw new AppError(401, 'Unauthorized');
+      if (!user) throw new AppError('Unauthorized', 401);
 
       await NotificationService.markAllAsRead(user.id);
 
@@ -52,3 +52,4 @@ export class NotificationController {
     }
   }
 }
+

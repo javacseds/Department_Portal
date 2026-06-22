@@ -66,7 +66,7 @@ export class StudentService {
       },
     });
 
-    if (!student) throw new AppError(404, 'Student not found');
+    if (!student) throw new AppError('Student not found', 404);
     return student;
   }
 
@@ -81,8 +81,8 @@ export class StudentService {
     });
 
     if (existing) {
-      if (existing.rollNumber === data.rollNumber) throw new AppError(409, 'Roll Number already exists');
-      if (existing.registerNumber === data.registerNumber) throw new AppError(409, 'Register Number already exists');
+      if (existing.rollNumber === data.rollNumber) throw new AppError('Roll Number already exists', 409);
+      if (existing.registerNumber === data.registerNumber) throw new AppError('Register Number already exists', 409);
     }
 
     return prisma.student.create({
@@ -108,8 +108,8 @@ export class StudentService {
       });
 
       if (existing) {
-        if (existing.rollNumber === data.rollNumber) throw new AppError(409, 'Roll Number already in use');
-        if (existing.registerNumber === data.registerNumber) throw new AppError(409, 'Register Number already in use');
+        if (existing.rollNumber === data.rollNumber) throw new AppError('Roll Number already in use', 409);
+        if (existing.registerNumber === data.registerNumber) throw new AppError('Register Number already in use', 409);
       }
     }
 
@@ -128,3 +128,5 @@ export class StudentService {
     return true;
   }
 }
+
+

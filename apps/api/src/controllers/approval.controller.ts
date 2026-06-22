@@ -27,7 +27,7 @@ export class ApprovalController {
       const { page, limit, search, departmentId, status, viewMode } = req.query;
       const user = req.user;
 
-      if (!user) throw new AppError(401, 'Unauthorized');
+      if (!user) throw new AppError('Unauthorized', 401);
 
       // viewMode can be 'my_requests' (what I asked for) or 'pending_action' (what I need to approve)
       const result = await ApprovalService.getAll({
@@ -60,7 +60,7 @@ export class ApprovalController {
       const validatedData = createApprovalSchema.parse(req.body);
       
       const userId = req.user?.id;
-      if (!userId) throw new AppError(401, 'Unauthorized');
+      if (!userId) throw new AppError('Unauthorized', 401);
 
       const approval = await ApprovalService.create({
         ...validatedData,
@@ -78,7 +78,7 @@ export class ApprovalController {
       const validatedData = actionSchema.parse(req.body);
       
       const user = req.user;
-      if (!user) throw new AppError(401, 'Unauthorized');
+      if (!user) throw new AppError('Unauthorized', 401);
 
       const approval = await ApprovalService.processAction(req.params.id, {
         action: validatedData.action,
@@ -102,3 +102,4 @@ export class ApprovalController {
     }
   }
 }
+

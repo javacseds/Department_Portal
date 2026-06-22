@@ -75,7 +75,7 @@ export class AchievementService {
       },
     });
 
-    if (!achievement) throw new AppError(404, 'Achievement not found');
+    if (!achievement) throw new AppError('Achievement not found', 404);
     return achievement;
   }
 
@@ -105,3 +105,4 @@ export class AchievementService {
     return true;
   }
 }
+

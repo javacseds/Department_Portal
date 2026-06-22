@@ -48,7 +48,7 @@ export class FormController {
       const validatedData = createFormSchema.parse(req.body);
       
       const userId = req.user?.id;
-      if (!userId) throw new AppError(401, 'Unauthorized');
+      if (!userId) throw new AppError('Unauthorized', 401);
 
       const form = await FormService.create({
         ...validatedData,
@@ -80,3 +80,4 @@ export class FormController {
     }
   }
 }
+

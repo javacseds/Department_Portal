@@ -63,7 +63,7 @@ export class DepartmentController {
       };
 
       if (!data.collegeId) {
-        throw new AppError(400, 'College ID is required');
+        throw new AppError('College ID is required', 400);
       }
 
       const department = await DepartmentService.create(data as any);
@@ -107,3 +107,4 @@ export class DepartmentController {
     }
   }
 }
+

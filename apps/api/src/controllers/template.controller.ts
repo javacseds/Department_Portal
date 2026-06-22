@@ -48,7 +48,7 @@ export class TemplateController {
       const validatedData = createTemplateSchema.parse(req.body);
       
       const userId = req.user?.id;
-      if (!userId) throw new AppError(401, 'Unauthorized');
+      if (!userId) throw new AppError('Unauthorized', 401);
 
       const template = await TemplateService.create({
         ...validatedData,
@@ -96,3 +96,4 @@ export class TemplateController {
     }
   }
 }
+
