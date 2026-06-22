@@ -1,0 +1,28 @@
+export const USER_ROLES = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  DEPARTMENT_ADMIN: 'DEPARTMENT_ADMIN',
+  HOD: 'HOD',
+  FACULTY: 'FACULTY',
+  OFFICE_STAFF: 'OFFICE_STAFF',
+  VIEW_ONLY: 'VIEW_ONLY',
+  GUEST: 'GUEST',
+} as const;
+
+export const EVENT_TYPES = [
+  'WORKSHOP', 'SEMINAR', 'GUEST_LECTURE', 'INDUSTRIAL_VISIT',
+  'HACKATHON', 'CONFERENCE', 'CULTURAL', 'SPORTS', 'PLACEMENT',
+  'EXAMINATION', 'OTHER',
+] as const;
+
+export const DOCUMENT_TYPES = ['PDF', 'DOCX', 'EXCEL', 'IMAGE', 'OTHER'] as const;
+
+export const ACADEMIC_YEARS = [
+  '2020-21', '2021-22', '2022-23', '2023-24', '2024-25', '2025-26', '2026-27',
+] as const;
+
+export const APPROVAL_STATUSES = [
+  'PENDING', 'APPROVED', 'REJECTED', 'REVISION_REQUESTED', 'WITHDRAWN',
+] as const;
+
+export const DEFAULT_PAGE_SIZE = 25;
+export const MAX_FILE_SIZE_MB = 50;
