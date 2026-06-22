@@ -1,11 +1,18 @@
-﻿import { Router } from 'express';
+import { Router } from 'express';
+import { NotificationController } from '../controllers/notification.controller';
 import { authenticate } from '../middlewares/auth';
+
 const router = Router();
+
 router.use(authenticate);
-// TODO: Implement notification routes
-router.get('/', (req, res) => res.json({ success: true, data: [], message: 'notification module ready' }));
-router.get('/:id', (req, res) => res.json({ success: true, data: null }));
-router.post('/', (req, res) => res.json({ success: true, message: 'Created' }));
-router.put('/:id', (req, res) => res.json({ success: true, message: 'Updated' }));
-router.delete('/:id', (req, res) => res.json({ success: true, message: 'Deleted' }));
+
+// Get my notifications
+router.get('/', NotificationController.getMyNotifications);
+
+// Mark all as read
+router.post('/mark-all-read', NotificationController.markAllAsRead);
+
+// Mark single notification as read
+router.post('/:id/read', NotificationController.markAsRead);
+
 export default router;

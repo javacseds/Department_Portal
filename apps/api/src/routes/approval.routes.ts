@@ -1,11 +1,24 @@
-﻿import { Router } from 'express';
+import { Router } from 'express';
+import { ApprovalController } from '../controllers/approval.controller';
 import { authenticate } from '../middlewares/auth';
+
 const router = Router();
+
 router.use(authenticate);
-// TODO: Implement approval routes
-router.get('/', (req, res) => res.json({ success: true, data: [], message: 'approval module ready' }));
-router.get('/:id', (req, res) => res.json({ success: true, data: null }));
-router.post('/', (req, res) => res.json({ success: true, message: 'Created' }));
-router.put('/:id', (req, res) => res.json({ success: true, message: 'Updated' }));
-router.delete('/:id', (req, res) => res.json({ success: true, message: 'Deleted' }));
+
+// Get all approvals (filtered by role/viewMode)
+router.get('/', ApprovalController.getAll);
+
+// Get single approval
+router.get('/:id', ApprovalController.getById);
+
+// Initiate approval request
+router.post('/', ApprovalController.create);
+
+// Process approval action (Approve/Reject)
+router.post('/:id/action', ApprovalController.processAction);
+
+// Delete approval (if needed)
+router.delete('/:id', ApprovalController.delete);
+
 export default router;
