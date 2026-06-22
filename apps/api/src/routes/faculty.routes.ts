@@ -1,11 +1,38 @@
-﻿import { Router } from 'express';
-import { authenticate } from '../middlewares/auth';
+import { Router } from 'express';
+import { FacultyController } from '../controllers/faculty.controller';
+import { authenticate, requireRoles } from '../middlewares/auth';
+import { USER_ROLES } from '@cddas/shared';
+
 const router = Router();
+
+// All faculty routes require authentication
 router.use(authenticate);
-// TODO: Implement faculty routes
-router.get('/', (req, res) => res.json({ success: true, data: [], message: 'faculty module ready' }));
-router.get('/:id', (req, res) => res.json({ success: true, data: null }));
-router.post('/', (req, res) => res.json({ success: true, message: 'Created' }));
-router.put('/:id', (req, res) => res.json({ success: true, message: 'Updated' }));
-router.delete('/:id', (req, res) => res.json({ success: true, message: 'Deleted' }));
+
+// Get all faculty (Anyone authenticated can see faculty lists)
+router.get('/', FacultyController.getAll);
+
+// Get single faculty
+router.get('/:id', FacultyController.getById);
+
+// Create faculty (Super Admin, Dept Admin, HOD)
+router.post(
+  '/', 
+  requireRoles([USER_ROLES.SUPER_ADMIN, USER_ROLES.DEPARTMENT_ADMIN, USER_ROLES.HOD]), 
+  FacultyController.create
+);
+
+// Update faculty
+router.put(
+  '/:id', 
+  requireRoles([USER_ROLES.SUPER_ADMIN, USER_ROLES.DEPARTMENT_ADMIN, USER_ROLES.HOD]), 
+  FacultyController.update
+);
+
+// Delete faculty
+router.delete(
+  '/:id', 
+  requireRoles([USER_ROLES.SUPER_ADMIN, USER_ROLES.DEPARTMENT_ADMIN]), 
+  FacultyController.delete
+);
+
 export default router;

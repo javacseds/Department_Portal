@@ -1,11 +1,37 @@
-﻿import { Router } from 'express';
-import { authenticate } from '../middlewares/auth';
+import { Router } from 'express';
+import { StudentController } from '../controllers/student.controller';
+import { authenticate, requireRoles } from '../middlewares/auth';
+import { USER_ROLES } from '@cddas/shared';
+
 const router = Router();
+
 router.use(authenticate);
-// TODO: Implement student routes
-router.get('/', (req, res) => res.json({ success: true, data: [], message: 'student module ready' }));
-router.get('/:id', (req, res) => res.json({ success: true, data: null }));
-router.post('/', (req, res) => res.json({ success: true, message: 'Created' }));
-router.put('/:id', (req, res) => res.json({ success: true, message: 'Updated' }));
-router.delete('/:id', (req, res) => res.json({ success: true, message: 'Deleted' }));
+
+// Get all students
+router.get('/', StudentController.getAll);
+
+// Get single student
+router.get('/:id', StudentController.getById);
+
+// Create student
+router.post(
+  '/', 
+  requireRoles([USER_ROLES.SUPER_ADMIN, USER_ROLES.DEPARTMENT_ADMIN, USER_ROLES.HOD, USER_ROLES.OFFICE_STAFF, USER_ROLES.FACULTY]), 
+  StudentController.create
+);
+
+// Update student
+router.put(
+  '/:id', 
+  requireRoles([USER_ROLES.SUPER_ADMIN, USER_ROLES.DEPARTMENT_ADMIN, USER_ROLES.HOD, USER_ROLES.OFFICE_STAFF, USER_ROLES.FACULTY]), 
+  StudentController.update
+);
+
+// Delete student
+router.delete(
+  '/:id', 
+  requireRoles([USER_ROLES.SUPER_ADMIN, USER_ROLES.DEPARTMENT_ADMIN, USER_ROLES.HOD]), 
+  StudentController.delete
+);
+
 export default router;
