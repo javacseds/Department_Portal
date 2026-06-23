@@ -226,7 +226,7 @@ function CircularModal({ isOpen, onClose, circular, departments, onSuccess }: an
     isGlobal: circular?.isGlobal !== false,
     issueDate: circular?.issueDate ? new Date(circular.issueDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
     validUntil: circular?.validUntil ? new Date(circular.validUntil).toISOString().split('T')[0] : '',
-    targetAudience: circular?.targetAudience || [USER_ROLES.FACULTY, USER_ROLES.STUDENT],
+    targetAudience: circular?.targetAudience || [USER_ROLES.FACULTY, 'STUDENT' as any],
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -352,7 +352,7 @@ function CircularModal({ isOpen, onClose, circular, departments, onSuccess }: an
             <div>
               <label className="label">Target Audience (Select at least one)</label>
               <div className="flex flex-wrap gap-2 mt-2">
-                {[USER_ROLES.FACULTY, USER_ROLES.STUDENT, USER_ROLES.HOD, USER_ROLES.OFFICE_STAFF].map(role => (
+                {[USER_ROLES.FACULTY, 'STUDENT' as any, USER_ROLES.HOD, USER_ROLES.OFFICE_STAFF].map(role => (
                   <button
                     key={role}
                     type="button"
@@ -381,3 +381,4 @@ function CircularModal({ isOpen, onClose, circular, departments, onSuccess }: an
     </div>
   );
 }
+
